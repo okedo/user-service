@@ -1,6 +1,7 @@
 package com.spikecorp.authserver.controller;
 
 import com.spikecorp.authserver.entity.User;
+import com.spikecorp.authserver.exception.UserNotFoundException;
 import com.spikecorp.authserver.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -32,7 +33,11 @@ public class UserController {
 
     @GetMapping("/{id}")
     public User getUserById(@PathVariable Long id) {
-        return userService.getUserById(id);
+        try {
+            return userService.getUserById(id);
+        } catch(UserNotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+        }
     }
 
     @GetMapping

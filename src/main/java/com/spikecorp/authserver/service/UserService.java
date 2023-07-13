@@ -1,11 +1,11 @@
 package com.spikecorp.authserver.service;
 
 import com.spikecorp.authserver.entity.User;
+import com.spikecorp.authserver.exception.UserNotFoundException;
 import com.spikecorp.authserver.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public class UserService {
     }
 
     public User getUserById(Long id) {
-        return repository.findById(id).orElse(null);
+        return repository.findById(id).orElseThrow(() -> new UserNotFoundException("No user with specified ID"));
     }
 
     public List<User> getAllUsers() {
