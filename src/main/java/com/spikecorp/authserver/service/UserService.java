@@ -5,6 +5,7 @@ import com.spikecorp.authserver.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
@@ -15,10 +16,16 @@ public class UserService {
     private UserRepository repository;
 
     public User createUser(@RequestBody User user) {
+        Boolean noUserName = user.getUsername() == null || user.getUsername().trim().isEmpty();
+        Boolean noPassword = user.getPassword() == null || user.getPassword().trim().isEmpty();
+        Boolean noEmail = user.getEmail() == null || user.getEmail().trim().isEmpty();
+        if (noUserName || noPassword || noEmail) {
+            throw new IllegalArgumentException("incorrect data");
+        }
         try {
             return repository.save(user);
         } catch (DataIntegrityViolationException ex) {
-            throw new IllegalArgumentException("Duplicate username or email");
+            throw new DataIntegrityViolationException("Duplicate username or email");
         }
     }
 
