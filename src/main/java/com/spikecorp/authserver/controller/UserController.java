@@ -2,6 +2,7 @@ package com.spikecorp.authserver.controller;
 
 import com.spikecorp.authserver.entity.User;
 import com.spikecorp.authserver.exception.DuplicateDataException;
+import com.spikecorp.authserver.exception.InternalDataFlowException;
 import com.spikecorp.authserver.exception.UserNotFoundException;
 import com.spikecorp.authserver.service.UserService;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,8 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage());
         } catch (IllegalArgumentException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        } catch (InternalDataFlowException ex) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong");
         }
     }
 

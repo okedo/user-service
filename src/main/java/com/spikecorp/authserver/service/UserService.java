@@ -1,7 +1,10 @@
 package com.spikecorp.authserver.service;
 
+import com.spikecorp.authserver.entity.Role;
 import com.spikecorp.authserver.entity.User;
 import com.spikecorp.authserver.exception.DuplicateDataException;
+import com.spikecorp.authserver.exception.InternalDataFlowException;
+import com.spikecorp.authserver.exception.RoleNotExistsException;
 import com.spikecorp.authserver.exception.UserNotFoundException;
 import com.spikecorp.authserver.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -10,17 +13,28 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @Service
 public class UserService {
+    private final RoleService roleService;
     private final UserRepository repository;
 
     public User createUser(@RequestBody User user) {
         validateUserData(user);
 
+        Set<Role> userRole = new HashSet<Role>();
         try {
+            userRole.add(roleService.getRoleByName("USER"));
+        } catch (RoleNotExistsException ex) {
+            throw new InternalDataFlowException("User role issue");
+        }
+
+        try {
+            user.setRoles(userRole);
             return repository.save(user);
         } catch (DataIntegrityViolationException ex) {
             throw new DuplicateDataException("Duplicate username or email");
