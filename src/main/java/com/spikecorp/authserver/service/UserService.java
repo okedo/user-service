@@ -9,6 +9,7 @@ import com.spikecorp.authserver.exception.UserNotFoundException;
 import com.spikecorp.authserver.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +23,7 @@ import java.util.Set;
 public class UserService {
     private final RoleService roleService;
     private final UserRepository repository;
+    private final Argon2PasswordEncoder encoder = new Argon2PasswordEncoder(32,64,1,15*1024,2);
 
     public User createUser(@RequestBody User user) {
         validateUserData(user);
@@ -34,6 +36,8 @@ public class UserService {
         }
 
         try {
+            String encryptedPassword = encoder.encode(user.getPassword());
+            user.setPassword(encryptedPassword);
             user.setRoles(userRole);
             return repository.save(user);
         } catch (DataIntegrityViolationException ex) {
@@ -90,7 +94,8 @@ public class UserService {
     private void updatePassword(User existingUser, User updatedUser) {
         String updatedPassword = updatedUser.getPassword();
         if (!ObjectUtils.isEmpty(updatedPassword) && !existingUser.getPassword().equals(updatedPassword)) {
-            existingUser.setPassword(updatedPassword);
+            String encryptedPassword = encoder.encode(existingUser.getPassword());
+            existingUser.setPassword(encryptedPassword);
         }
     }
 
