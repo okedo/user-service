@@ -68,6 +68,11 @@ public class UserService {
         repository.deleteById(id);
     }
 
+    public Set<Role> getUserRoles(Long userId) {
+        User user = this.getUserById(userId);
+        return user.getRoles();
+    }
+
     private void validateUserData(User user) {
         if (ObjectUtils.isEmpty(user.getUsername()) || ObjectUtils.isEmpty(user.getPassword())
                 || ObjectUtils.isEmpty(user.getEmail())) {

@@ -6,6 +6,7 @@ import com.spikecorp.authserver.repository.RoleRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+
 @Service
 @AllArgsConstructor
 public class RoleService {
